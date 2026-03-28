@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Jihaaa 🕊️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;500;700&family=Pinyon+Script&display=swap');
+
+        :root {
+            --pink: #ffafbd;
+            --rose: #d4818e;
+            --soft-white: rgba(255, 255, 255, 0.7);
+            --glass: rgba(255, 255, 255, 0.4);
+            --grad: linear-gradient(135deg, #fff5e6 0%, #ffdee9 50%, #e6ccff 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
+            background: var(--grad);
+            background-size: 400% 400%;
+            animation: flow 15s ease infinite;
+            height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            cursor: none;
+        }
+
+        @keyframes flow { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
+
+        /* --- CURSOR & CLICK EFFECTS --- */
+        .cursor-trail {
+            position: fixed; pointer-events: none; z-index: 10000;
+            font-size: 12px; animation: fadeOut 0.8s forwards;
+        }
+        .click-heart {
+            position: absolute; pointer-events: none; z-index: 9999;
+            animation: popUp 1s ease-out forwards; font-size: 20px;
+        }
+        @keyframes fadeOut { from {opacity: 1; transform: scale(1);} to {opacity:0; transform: scale(0.5);} }
+        @keyframes popUp { 0% {transform: scale(0) translateY(0);} 100% {transform: scale(1.5) translateY(-50px); opacity:0;} }
+
+        /* --- SPA SECTIONS --- */
+        .main-container { width: 90%; max-width: 500px; z-index: 100; text-align: center; }
+        .section { display: none; opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .section.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* --- GLASS CARDS --- */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 40px; padding: 2.5rem 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { font-family: 'Dancing Script', cursive; color: var(--rose); font-size: 2.2rem; margin-bottom: 1rem; }
+        h2 { font-family: 'Pinyon Script', cursive; color: #7a5c5c; font-size: 2.5rem; }
+        .highlight-name { 
+            color: var(--rose); font-weight: 700; cursor: pointer;
+            text-shadow: 0 0 10px rgba(212, 129, 142, 0.3);
+            animation: nameGlow 2s infinite;
+        }
+        @keyframes nameGlow { 0%, 100% {text-shadow: 0 0 5px var(--pink);} 50% {text-shadow: 0 0 20px var(--rose);} }
+
+        /* --- BUTTONS --- */
+        .btn {
+            background: white; border: none; padding: 14px 30px;
+            border-radius: 50px; color: var(--rose); font-weight: 700;
+            margin: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: 0.3s; font-family: 'Quicksand', sans-serif;
+        }
+        .btn:hover { transform: scale(1.05); background: var(--rose); color: white; }
+        .btn-choice { display: block; width: 100%; margin: 10px 0; }
+
+        /* --- SPECIAL ANIMATIONS --- */
+        .line-text { opacity: 0; transition: 1.5s; margin-bottom: 10px; display: block; }
+        .chat-bubble { 
+            background: white; padding: 12px 18px; border-radius: 20px; 
+            margin: 10px auto; width: fit-content; max-width: 85%;
+            opacity: 0; transform: translateX(-20px); transition: 0.5s;
+        }
+
+        /* --- CANVAS --- */
+        #canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 50; }
+        
+        .music-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            background: white; width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+    </style>
+</head>
+<body onclick="spawnHeart(event)">
+
+    <canvas id="canvas"></canvas>
+    <div class="music-toggle" onclick="toggleMusic()">🎵</div>
+    <audio id="bg-music" loop>
+        <source src="music.mp3.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="main-container" id="app">
+        <div id="s1" class="section active">
+            <h1 id="welcome-text"></h1>
+            <button class="btn" onclick="initApp()">Tekan sinii... 💌</button>
+        </div>
+
+        <div id="s2" class="section">
+            <div class="glass-card">
+                <h2 id="comp-display"></h2>
+                <button class="btn" onclick="nextComp()">more ✨</button>
+            </div>
+        </div>
+
+        <div id="s3" class="section">
+            <div class="glass-card">
+                <h1 id="qa-question" style="font-size: 1.5rem;"></h1>
+                <div id="qa-options"></div>
+                <p id="qa-response" style="margin-top:15px; font-style: italic; color: var(--rose); display:none;"></p>
+                <button id="qa-next" class="btn" style="display:none;" onclick="nextQuestion()">Next Question 🤍</button>
+            </div>
+        </div>
+
+        <div id="s4" class="section">
+            <div style="transition: 2s;" id="zoom-box">
+                <h1 style="font-size: 1.5rem;">I think you’re smiling right now...</h1>
+                <h1 id="caught-sub" style="opacity:0; transition: 1s; font-size: 1.2rem;">And if you are… that’s all I wanted.</h1>
+            </div>
+            <button class="btn" onclick="goTo(5)" style="margin-top: 30px;">Next 😳</button>
+        </div>
+
+        <div id="s5" class="section">
+            <div class="glass-card" style="text-align: left;">
+                <span class="line-text" id="l1">I don’t know when it started,</span>
+                <span class="line-text" id="l2">but somehow you became someone I notice more than I expected.</span>
+                <span class="line-text" id="l3">And now… you’re someone I look forward to,</span>
+                <h1 class="line-text highlight-name" id="l4" onclick="showPopup()">without even trying.</h1>
+                <center><button class="btn" onclick="goTo(6)">Wait, ada lagi...</button></center>
+            </div>
+        </div>
+
+        <div id="s6" class="section">
+            <p id="conf1" style="opacity:0">Okay… just one honest thing.</p>
+            <h1 id="conf2" style="opacity:0; margin: 20px 0;">I like talking to you.</h1>
+            <h2 id="conf3" style="opacity:0; color: var(--rose);">And maybe… I like you a little more than I should.</h2>
+            <button class="btn" onclick="goTo(7)" style="margin-top: 40px;">Next 🫣</button>
+        </div>
+
+        <div id="s7" class="section">
+            <div class="glass-card">
+                <p id="detect-text">System scanning...</p>
+                <h1 id="detect-result" style="display:none; color: var(--rose);">System detected:<br>Someone is blushing right now...</h1>
+                <p id="detect-sub" style="display:none;">Don’t worry, I won’t expose you. 😉</p>
+                <button class="btn" onclick="goTo(8)" style="margin-top: 20px;">🫣</button>
+            </div>
+        </div>
+
+        <div id="s8" class="section">
+            <div class="chat-bubble" id="c1">Why is this actually making me smile 😭</div>
+            <div class="chat-bubble" id="c2">This is too much…</div>
+            <div class="chat-bubble" id="c3">Okay this is actually cute…</div>
+            <div class="chat-bubble" id="c4" style="background: var(--rose); color: white; font-weight: bold;">I know… but you’re worth it.</div>
+            <button class="btn" onclick="goTo(9)">Next 🌙</button>
+        </div>
+
+        <div id="s9" class="section">
+            <div class="glass-card">
+                <p>This wasn’t perfect…</p>
+                <h2>but it was real.</h2>
+                <p style="margin-top: 15px;">And maybe… I just wanted to be the reason you smiled today.</p>
+                <button class="btn" onclick="location.reload()">Replay 💗</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- CORE LOGIC --- */
+        let step = 0;
+        const comps = ["You have a very calming vibe", "Your smile is really something", "You’re effortlessly nice to look at"];
+        
+        const questions = [
+            { q: "Be honest… are you smiling right now?", a: ["No 😐", "Maybe 😳", "Yes 😭"], r: "I knew it… you can’t hide that smile." },
+            { q: "Do you think this is a bit too much?", a: ["Yes", "A little", "Not really"], r: "I thought so… but you’re worth the extra effort." },
+            { q: "Should I stop here?", a: ["Yes", "No", "Up to you"], r: "Too late… I’m already this far because of you." }
+        ];
+        let qIdx = 0;
+
+        /* --- EFFECTS --- */
+        function spawnHeart(e) {
+            const h = document.createElement('div');
+            h.className = 'click-heart';
+            h.innerHTML = '💖';
+            h.style.left = e.clientX + 'px';
+            h.style.top = e.clientY + 'px';
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 1000);
+            playClick();
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const t = document.createElement('div');
+            t.className = 'cursor-trail';
+            t.innerHTML = '✨';
+            t.style.left = e.clientX + 'px';
+            t.style.top = e.clientY + 'px';
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 800);
+        });
+
+        function playClick() {
+            const context = new AudioContext();
+            const osc = context.createOscillator();
+            const gain = context.createGain();
+            osc.connect(gain); gain.connect(context.destination);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(440, context.currentTime);
+            gain.gain.setValueAtTime(0.1, context.currentTime);
+            osc.start(); osc.stop(context.currentTime + 0.05);
+        }
+
+        /* --- NAVIGATION --- */
+        function goTo(num) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            setTimeout(() => {
+                const target = document.getElementById('s' + num);
+                target.classList.add('active');
+                if(num === 2) nextComp();
+                if(num === 3) nextQuestion();
+                if(num === 4) runCaughtMoment();
+                if(num === 5) revealLines();
+                if(num === 6) revealConfession();
+                if(num === 7) runScanner();
+                if(num === 8) revealChats();
+            }, 400);
+        }
+
+        /* --- INITIALIZE --- */
+        const nameMsg = "Hi Jihaaa... I made something special for you 💌";
+        let charIdx = 0;
+        function typeWelcome() {
+            if(charIdx < nameMsg.length) {
+                const span = document.createElement('span');
+                span.textContent = nameMsg[charIdx];
+                if(nameMsg.substring(charIdx-15, charIdx+1).includes("Nur Hana Nazihah")) {
+                    span.className = "highlight-name";
+                    span.onclick = () => showPopup();
+                }
+                document.getElementById('welcome-text').appendChild(span);
+                charIdx++; setTimeout(typeWelcome, 70);
+            }
+        }
+        window.onload = typeWelcome;
+
+        function initApp() {
+            document.getElementById('bg-music').play();
+            createFirework();
+            goTo(2);
+        }
+
+        /* --- SECTION LOGIC --- */
+        function nextComp() {
+            if(step < comps.length) {
+                const el = document.getElementById('comp-display');
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    el.innerText = comps[step++];
+                    el.style.opacity = 1;
+                }, 400);
+            } else { goTo(3); }
+        }
+
+        function nextQuestion() {
+            if(qIdx < questions.length) {
+                const qObj = questions[qIdx++];
+                const qText = document.getElementById('qa-question');
+                const qOpts = document.getElementById('qa-options');
+                const qResp = document.getElementById('qa-response');
+                const qNext = document.getElementById('qa-next');
+
+                qText.innerText = qObj.q;
+                qResp.style.display = 'none';
+                qNext.style.display = 'none';
+                qOpts.innerHTML = '';
+
+                qObj.a.forEach(choice => {
+                    const b = document.createElement('button');
+                    b.className = 'btn btn-choice';
+                    b.innerText = choice;
+                    b.onclick = () => {
+                        qOpts.innerHTML = '';
+                        qResp.innerText = qObj.r;
+                        qResp.style.display = 'block';
+                        qNext.style.display = 'inline-block';
+                        createFirework();
+                    };
+                    qOpts.appendChild(b);
+                });
+            } else { goTo(4); }
+        }
+
+        function runCaughtMoment() {
+            setTimeout(() => {
+                document.getElementById('zoom-box').style.transform = "scale(1.2)";
+                setTimeout(() => {
+                    document.getElementById('caught-sub').style.opacity = 1;
+                }, 1500);
+            }, 500);
+        }
+
+        function revealLines() {
+            [1,2,3,4].forEach((id, i) => {
+                setTimeout(() => { document.getElementById('l'+id).style.opacity = 1; }, i * 1500);
+            });
+        }
+
+        function revealConfession() {
+            [1,2,3].forEach((id, i) => {
+                setTimeout(() => { document.getElementById('conf'+id).style.opacity = 1; }, i * 2000);
+            });
+        }
+
+        function runScanner() {
+            const dt = document.getElementById('detect-text');
+            setTimeout(() => {
+                dt.innerText = "Scanning facial heat...";
+                setTimeout(() => {
+                    dt.style.display = 'none';
+                    document.getElementById('detect-result').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('detect-sub').style.display = 'block';
+                    }, 1000);
+                }, 2000);
+            }, 1000);
+        }
+
+        function revealChats() {
+            [1,2,3,4].forEach((id, i) => {
+                setTimeout(() => {
+                    const c = document.getElementById('c'+id);
+                    c.style.opacity = 1; c.style.transform = "translateX(0)";
+                }, i * 1200);
+            });
+        }
+
+        function showPopup() {
+            alert("You’re really special, you know that?");
+        }
+
+        function toggleMusic() {
+            const m = document.getElementById('bg-music');
+            m.paused ? m.play() : m.pause();
+        }
+
+        /* --- FIREWORKS --- */
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+        function createFirework() {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * (canvas.height/2);
+            for(let i=0; i<30; i++) {
+                particles.push({
+                    x, y, vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8,
+                    alpha: 1, color: `hsl(${Math.random()*40 + 330}, 100%, 75%)`
+                });
+            }
+        }
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.alpha -= 0.01;
+                ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill();
+                if(p.alpha <= 0) particles.splice(i, 1);
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
